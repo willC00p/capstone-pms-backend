@@ -41,4 +41,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function userDetail()
+    {
+        return $this->hasOne(UserDetails::class);
+    }
+
+    public function team()
+    {
+        return $this->belongsToMany(Teams::class, 'team_user')->withPivot('role');
+    }
 }
