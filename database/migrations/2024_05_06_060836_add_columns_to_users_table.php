@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->bigInteger('wallet')->default(0)->after('remember_token')->nullable();
-            $table->integer('refer_count')->default(0)->after('waller')->nullable();
+            $table->integer('refer_count')->default(0)->after('wallet')->nullable();
         });
     }
 
