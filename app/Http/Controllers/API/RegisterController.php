@@ -2,6 +2,7 @@
    
 namespace App\Http\Controllers\API;
    
+use App\Models\UserDetails;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\User;
@@ -18,8 +19,9 @@ class RegisterController extends BaseController
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email',
+            'firstname' => 'required',
+            'lastname' => 'required',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required',
             'c_password' => 'required|same:password',
         ]);
@@ -30,9 +32,21 @@ class RegisterController extends BaseController
    
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
-        $user = User::create($input);
+        $new_user = [
+            'name' => $input['firstname'] . " " . $input['lastname'],
+            'email' => $input['email'],
+            'password' => $input['password']
+        ];
+        $user = User::create($new_user);
         $success['token'] =  $user->createToken('MyApp')->plainTextToken;
         $success['name'] =  $user->name;
+        $user->userDetail()->save(UserDetails::create([
+            'user_id' => $user->id,
+            'firstname' => $input['firstname'],
+            'lastname' => $input['lastname'],
+            'nationality' => 'Filipino',
+            'membership_date' => $user->created_at
+        ]));
    
         return $this->sendResponse($success, 'User register successfully.');
     }
