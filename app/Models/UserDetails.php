@@ -11,10 +11,15 @@ class UserDetails extends Model
 
     protected $fillable = [
         'user_id',
-        'firstname','lastname',
-        'nationality','address','municipality','provice','country','zip_code',
-        'father_firstname','father_lastname',
-        'mother_firstname','mother_lastname',
-        'spouse_firstname','spouse_lastname'
+        'firstname', 'middlename', 'lastname', 
+        'email', 'dob', 'gender', 'civil_status', 
+        'nationality', 'religion', 'place_of_birth', 
+        'address', 'municipality', 'provice', 'country', 'zip_code', 
+        'fb_account_name', 
+        'father_firstname', 'father_middleinitial', 'father_lastname', 
+        'mother_firstname', 'mother_middleinitial', 'mother_lastname', 
+        'spouse_firstname', 'spouse_middleinitial', 'spouse_lastname', 
+        'no_of_children', 'source_of_income', 'work_description', 'id_card_presented', 'membership_date', 
+        'profile_photo_path',
     ];
 }
