@@ -2,11 +2,14 @@
    
 namespace App\Http\Controllers\API;
    
+use App\Models\TeamUser;
 use App\Models\UserDetails;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Validator;
    
 class RegisterController extends BaseController
@@ -24,6 +27,15 @@ class RegisterController extends BaseController
             'email' => 'required|email|unique:users,email',
             'password' => 'required',
             'c_password' => 'required|same:password',
+            'referred_by' => [
+                'nullable', 
+                'email', 
+                Rule::exists('users', 'email'), 
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    $referrer = User::where('email', $value)->first();
+                    if ($referrer && $referrer->refer_count >= 10) { $fail("Referrer exceeded count of refers."); }
+                }
+            ]
         ]);
    
         if($validator->fails()){
@@ -47,6 +59,28 @@ class RegisterController extends BaseController
             'nationality' => 'Filipino',
             'membership_date' => $user->created_at
         ]));
+
+        $team = $user->team()->create([
+            'user_id' => $user->id,
+            'name' => $user->name . "'s TEAM",
+            'personal_team' => 1,
+        ]);
+
+        $team->team_user()->update([
+            'user_id' => $user->id,
+            'created_at' => Carbon::now()
+        ]);
+        
+        if (!is_null($input['referred_by'])) {
+            $referrer = User::where('email', $input['referred_by'])->first();
+            $referrer->refer_count = $referrer->refer_count + 1;
+            $referrer->save();
+
+            $team->team_user()->update([
+                'user_id' => $user->id,
+                'lead_id' => $referrer->id,
+            ]);
+        }
    
         return $this->sendResponse($success, 'User register successfully.');
     }

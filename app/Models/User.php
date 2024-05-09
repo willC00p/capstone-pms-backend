@@ -47,8 +47,13 @@ class User extends Authenticatable
         return $this->hasOne(UserDetails::class);
     }
 
-    public function team()
+    public function myTeam()
     {
-        return $this->belongsToMany(Teams::class, 'team_user')->withPivot('role');
+        return $this->hasOne(Teams::class, 'user_id', 'id');
+    }
+
+    public function precedingTeamLead()
+    {
+        return $this->myTeam->leads()->first() ? $this->myTeam->leads()->first()->precedingTeamLead()->merge([$this->myTeam->leads()->first()]):collect();
     }
 }
