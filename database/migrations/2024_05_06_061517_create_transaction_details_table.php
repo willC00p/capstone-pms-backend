@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('transaction_details', function (Blueprint $table) {
             $table->id();
-            $table->integer('transaction_id');
+            $table->integer('transactions_id');
             $table->integer('item_id');
             $table->integer('quantity');
             $table->float('price');

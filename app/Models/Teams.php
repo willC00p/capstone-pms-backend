@@ -15,17 +15,23 @@ class Teams extends Model
      * @var string[]
      */
     protected $fillable = [
+        'user_id',
         'name',
         'personal_team',
     ];
 
+    public function team_user()
+    {
+        return $this->hasMany(TeamUser::class, 'team_id', 'id');
+    }
+
     public function members()
     {
-        return $this->belongsToMany(User::class, 'team_user')->wherePivot('role', 'MEMBER');
+        return $this->belongsToMany(User::class, 'team_user', 'user_id');
     }
 
     public function leads()
     {
-        return $this->belongsToMany(User::class, 'team_user')->wherePivot('role', 'LEAD');
+        return $this->belongsToMany(User::class, 'team_user', 'user_id', 'lead_id');
     }
 }

@@ -12,7 +12,7 @@ class TransactionController extends BaseController
 {
     public function index()
     {
-        return Transactions::all();
+        return $this->sendResponse(Transactions::with('details')->get(), "Successfully retrieved all transactions.");
     }
 
     public function store(Request $request)
@@ -29,43 +29,47 @@ class TransactionController extends BaseController
         $transaction = DB::transaction(function () use ($input) {
             return tap(
                 Transactions::create([
-                    'user_id' => $input['node_customer']->id
+                    'user_id' => $input['node_customer']
                 ]),
                 function (Transactions $transaction) use ($input) {
+                    // Get user's preceding upline referrer
                     $user = User::find($transaction->user_id);
-                    $precedingTeamLeads = collect();
-
-                    foreach ($user->teams as $key => $team) {
-                        $teamLeadsBeforeUser = $team->leads()->get();
-                        $precedingTeamLeads = $precedingTeamLeads->merge($teamLeadsBeforeUser);
-                    }
-
-                    $precedingTeamLeads = $precedingTeamLeads->unique();
+                    $precedingTeams = $user->precedingTeamLead();
+                    $precedingTeamLeads_cnt = $precedingTeams->count();
 
                     // create a function to save shareable amount to above nodes
-                    $transactions = array_map(function ($x) use ($transaction) {
+                    $transactions = array_map(function ($x) use ($transaction, $precedingTeamLeads_cnt) {
+                        // compute for percentage to be taken out from the sale
                         $amount = $x['price'] * $x['quantity'];
-                        $shareable = $amount * 0.1;
+                        $shareable = $amount * ($precedingTeamLeads_cnt / 100);
+                        $finalAmount = $amount - $shareable;
+
                         return [
-                            'transaction_id' => $transaction->id,
-                            'item_id' => $x['product']->id,
+                            'item_id' => $x['product'],
                             'quantity' => $x['quantity'],
-                            'price' => $amount
+                            'price' => $finalAmount,
+                            'shareable' => $shareable,
+                            'lead_cnt' => $precedingTeamLeads_cnt
                         ];
                     }, $input['transaction']);
                     // dd($transactions);
                     foreach ($transactions as $key => $value) {
+                        extract($value);
+                        unset($value['shareable']);
+                        unset($value['lead_cnt']);
                         $transaction->details()->create($value);
-                    }
 
-                    dd($precedingTeamLeads);
+                        $add_to_wallet = $shareable / $lead_cnt;
+                        foreach ($precedingTeams->reverse() as $key => $lead_user) {
+                            $leadu = User::find($lead_user->id);
+                            $leadu->wallet += $add_to_wallet;
+                            $leadu->save();
+                        }
+                    }
                 }
             );
         });
 
-        return response()->json([
-            'success' => true,
-            'transaction' => $transaction
-        ]);
+        return $this->sendResponse($transaction, "Successfully created a transaction.");
     }
 }
