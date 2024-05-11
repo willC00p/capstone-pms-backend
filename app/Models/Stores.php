@@ -9,6 +9,8 @@ class Stores extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['owner_id', 'name', 'address', 'city', 'province', 'country'];
+
     public function user()
     {
         return $this->belongsTo(User::class);
