@@ -56,4 +56,14 @@ class User extends Authenticatable
     {
         return $this->myTeam->leads()->first() ? $this->myTeam->leads()->first()->precedingTeamLead()->merge([$this->myTeam->leads()->first()]):collect();
     }
+
+    public function stores()
+    {
+        return $this->hasMany(Stores::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transactions::class);
+    }
 }

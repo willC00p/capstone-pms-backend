@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->integer('roles_id')->after('id');
             $table->bigInteger('wallet')->default(0)->after('remember_token')->nullable();
             $table->integer('refer_count')->default(0)->after('wallet')->nullable();
         });
