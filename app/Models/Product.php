@@ -17,4 +17,11 @@ class Product extends Model
     protected $fillable = [
         'name', 'detail'
     ];
+
+    public $timestamps = true;
+
+    public function category()
+    {
+        return $this->belongsTo(Categories::class);
+    }
 }
