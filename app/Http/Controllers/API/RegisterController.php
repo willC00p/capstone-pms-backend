@@ -60,7 +60,7 @@ class RegisterController extends BaseController
             'membership_date' => $user->created_at
         ]));
 
-        $team = $user->team()->create([
+        $team = $user->myTeam()->create([
             'user_id' => $user->id,
             'name' => $user->name . "'s TEAM",
             'personal_team' => 1,

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\StoreController;
 use App\Http\Controllers\API\UsersController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -32,4 +33,5 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::resource('users', UsersController::class);
     Route::resource('products', ProductController::class);
     Route::resource('transactions', TransactionController::class);
+    Route::resource('stores', StoreController::class);
 });
