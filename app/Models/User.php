@@ -18,6 +18,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'roles_id',
         'name',
         'email',
         'password',
@@ -55,6 +56,11 @@ class User extends Authenticatable
     public function precedingTeamLead()
     {
         return $this->myTeam->leads()->first() ? $this->myTeam->leads()->first()->precedingTeamLead()->merge([$this->myTeam->leads()->first()]):collect();
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Roles::class, 'roles_id', 'id');
     }
 
     public function stores()
