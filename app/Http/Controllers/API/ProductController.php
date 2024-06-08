@@ -33,6 +33,8 @@ class ProductController extends BaseController
    
         $validator = Validator::make($input, [
             'name' => 'required',
+            'price' => 'required|numeric',
+            'stock' => 'required|numeric',
             'detail' => 'required'
         ]);
    
@@ -75,6 +77,8 @@ class ProductController extends BaseController
    
         $validator = Validator::make($input, [
             'name' => 'required',
+            'price' => 'required|numeric',
+            'stock' => 'required|numeric',
             'detail' => 'required'
         ]);
    
@@ -84,6 +88,8 @@ class ProductController extends BaseController
    
         $product->name = $input['name'];
         $product->detail = $input['detail'];
+        $product->price = $input['price'];
+        $product->stock = $input['stock'];
         $product->save();
    
         return $this->sendResponse(new ProductResource($product), 'Product updated successfully.');
