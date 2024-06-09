@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\TransactionController;
+use App\Http\Controllers\API\TreeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,4 +35,7 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::resource('products', ProductController::class);
     Route::resource('transactions', TransactionController::class);
     Route::resource('stores', StoreController::class);
+    // Route::resource('trees', TreeController::class);
+    Route::get('/trees', [TreeController::class, 'index']);
+    Route::get('/trees/{lead}', [TreeController::class, 'show']);
 });

@@ -14,4 +14,9 @@ class TeamUser extends Model
     protected $fillable = [
         'team_id', 'user_id', 'lead_id'
     ];
+
+    public function team()
+    {
+        return $this->belongsTo(Teams::class);
+    }
 }

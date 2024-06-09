@@ -9,6 +9,8 @@ class Teams extends Model
 {
     use HasFactory;
 
+    protected $table = "teams";
+
     /**
      * The attributes that are mass assignable.
      *
@@ -27,7 +29,7 @@ class Teams extends Model
 
     public function members()
     {
-        return $this->belongsToMany(User::class, 'team_user', 'user_id');
+        return $this->belongsToMany(User::class, 'team_user', 'lead_id');
     }
 
     public function leads()

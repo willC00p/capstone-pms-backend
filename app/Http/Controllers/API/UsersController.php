@@ -72,13 +72,13 @@ class UsersController extends BaseController
                         'personal_team' => 1,
                     ]);
             
-                    $team->team_user()->update([
+                    $team->team_user()->create([
                         'user_id' => $user->id,
                         'created_at' => Carbon::now()
                     ]);
                     
-                    if (!is_null($input['referred_by']) && $user->role->name == 'Member') {
-                        $referrer = User::where('email', $input['referred_by'])->first();
+                    if (!is_null($input['referrer']) && $user->role->name == 'Member') {
+                        $referrer = User::where('email', $input['referrer'])->first();
                         $referrer->refer_count = $referrer->refer_count + 1;
                         $referrer->save();
             
