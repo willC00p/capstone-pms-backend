@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('team_user', function (Blueprint $table) {
+        Schema::create('qr_code', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('team_id');
-            $table->foreignId('user_id');
-            $table->integer('lead_id')->nullable();
+            $table->unsignedBigInteger('history_id')->nullable();
+            //$table->integer('history_id');
+            $table->dateTime('generated_time');
             $table->timestamps();
-            
-            $table->unique(['team_id', 'user_id']);
         });
     }
 
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('team_user');
+        Schema::dropIfExists('qr_code');
     }
 };

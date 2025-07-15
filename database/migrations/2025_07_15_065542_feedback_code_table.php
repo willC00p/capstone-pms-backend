@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stores', function (Blueprint $table) {
+            Schema::create('feedback', function (Blueprint $table) {
             $table->id();
-            $table->integer('owner_id');
-            $table->string('name');
-            $table->string('address');
-            $table->string('city');
-            $table->string('province');
-            $table->string('country');
+            $table->foreignId('user_id')->constrained('users_info')->onDelete('cascade');
+            //$table->integer('user_id');
+            $table->tinyInteger('rating'); // usually 1–5
+            $table->dateTime('date_time');
+            $table->text('comments')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stores');
+        //
     }
 };

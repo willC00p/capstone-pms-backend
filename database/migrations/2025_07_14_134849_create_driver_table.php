@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('inventory', function (Blueprint $table) {
+        Schema::create('driver', function (Blueprint $table) {
             $table->id();
-            $table->integer('store_id');
-            $table->integer('product_id');
-            $table->integer('quantity');
+            $table->integer('user_id');
+            $table->string('qr_code');
+            $table->string('department');
+            $table->string('position');
+            $table->text('driver_license');
             $table->timestamps();
         });
     }
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('inventory');
+        Schema::dropIfExists('driver');
     }
 };
