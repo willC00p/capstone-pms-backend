@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('qr_code', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('history_id')->nullable();
-            //$table->integer('history_id');
+            $table->integer('history_id');
             $table->dateTime('generated_time');
             $table->timestamps();
         });

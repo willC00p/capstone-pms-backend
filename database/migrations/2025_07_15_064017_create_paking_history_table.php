@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('paking_history', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vehicle_id')->constrained('vehicle')->onDelete('cascade');
-            //$table->integer('vehicle_id');
+            $table->integer('vehicle_id');
             $table->string('parking_code');
             $table->dateTime('enrty_date_time');
             $table->dateTime('exit_date_time')->nullable();

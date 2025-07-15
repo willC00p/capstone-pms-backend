@@ -13,8 +13,7 @@ return new class extends Migration
     {
             Schema::create('feedback', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users_info')->onDelete('cascade');
-            //$table->integer('user_id');
+            $table->integer('user_id');
             $table->tinyInteger('rating'); // usually 1–5
             $table->dateTime('date_time');
             $table->text('comments')->nullable();

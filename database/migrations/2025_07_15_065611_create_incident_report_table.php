@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('incident_report', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users_info')->onDelete('cascade');
-            //$table->integer('user_id');
+            $table->integer('user_id');
             $table->dateTime('date_time');
             $table->text('details');
             $table->timestamps();

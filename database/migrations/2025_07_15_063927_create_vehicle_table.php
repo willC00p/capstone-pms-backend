@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('vehicle', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('driver_id')->constrained('driver')->onDelete('cascade');
-           // $table->string('vehicle_type');
+            $table->string('vehicle_type');
             $table->string('plate_no')->unique();
             $table->string('or'); 
             $table->string('cr'); 

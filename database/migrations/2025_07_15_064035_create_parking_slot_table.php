@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('parking_slot', function (Blueprint $table) {
             $table->string('parking_code')->primary();
-            $table->foreignId('vehicle_id')->nullable()->constrained('vehicle')->nullOnDelete();
-            //$table->integer('vehicle_id');
+            $table->integer('vehicle_id');
             $table->string('location');
-            $table->enum('status', ['availavle', 'occupied', 'reserved']);
+            $table->enum('status', ['available', 'occupied', 'reserved']);
             $table->timestamps();
         });
     }
