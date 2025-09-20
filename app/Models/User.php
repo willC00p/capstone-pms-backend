@@ -48,6 +48,21 @@ class User extends Authenticatable
         return $this->hasOne(UserDetails::class);
     }
 
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'roles_id');
+    }
+
+    public function userDetails()
+    {
+        return $this->hasOne(UserDetails::class);
+    }
+
+    public function parkingAssignments()
+    {
+        return $this->hasMany(ParkingAssignment::class);
+    }
+
     public function myTeam()
     {
         return $this->hasOne(Teams::class, 'user_id', 'id');
@@ -56,11 +71,6 @@ class User extends Authenticatable
     public function precedingTeamLead()
     {
         return $this->myTeam->leads()->first() ? $this->myTeam->leads()->first()->precedingTeamLead()->merge([$this->myTeam->leads()->first()]):collect();
-    }
-
-    public function role()
-    {
-        return $this->belongsTo(Roles::class, 'roles_id', 'id');
     }
 
     public function stores()

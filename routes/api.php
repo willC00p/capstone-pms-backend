@@ -10,6 +10,12 @@ use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\TreeController;
 
+// Add missing route for byLayout
+Route::get('parking-assignments/by-layout/{layoutId}', [App\Http\Controllers\API\ParkingAssignmentController::class, 'byLayout']);
+use App\Http\Controllers\API\ParkingLayoutController;
+use App\Http\Controllers\API\ParkingAssignmentController;
+use App\Http\Controllers\FileController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,6 +27,9 @@ use App\Http\Controllers\API\TreeController;
 |
 */
 
+// Public routes for serving images
+Route::get('image/{path}', [FileController::class, 'serveImage'])->where('path', '.*');
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -28,13 +37,55 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::controller(RegisterController::class)->group(function(){
     Route::post('register', 'register');
     Route::post('login', 'login');
+    Route::post('logout', 'logout');
 });
+
+// Forgot password (code-based)
+Route::post('forgot/send-code', [App\Http\Controllers\API\ForgotPasswordController::class, 'sendResetCode']);
+Route::post('forgot/reset', [App\Http\Controllers\API\ForgotPasswordController::class, 'resetPassword']);
+
+// Frontend-friendly aliases
+Route::post('forgot-password', [App\Http\Controllers\API\ForgotPasswordController::class, 'sendResetCode']);
+Route::post('reset-password', [App\Http\Controllers\API\ForgotPasswordController::class, 'resetPassword']);
+
+// Account routes (frontend expects /account/*)
+Route::get('account', [App\Http\Controllers\API\SettingsController::class, 'profile']);
+Route::post('account/update-profile', [App\Http\Controllers\API\SettingsController::class, 'updateProfile']);
+Route::post('account/profile-pic', [App\Http\Controllers\API\SettingsController::class, 'updateProfilePic']);
+// Alias to match backend2
+Route::post('account/update-profile-pic', [App\Http\Controllers\API\SettingsController::class, 'updateProfilePic']);
+Route::post('account/password', [App\Http\Controllers\API\SettingsController::class, 'updatePassword']);
+Route::delete('account/delete', [App\Http\Controllers\API\SettingsController::class, 'deleteAccount']);
      
 Route::middleware('auth:sanctum')->group( function () {
+    // Settings and profile routes
+    Route::get('settings/profile', [App\Http\Controllers\API\SettingsController::class, 'profile']);
+    Route::put('settings/profile', [App\Http\Controllers\API\SettingsController::class, 'updateProfile']);
+    Route::post('settings/profile-pic', [App\Http\Controllers\API\SettingsController::class, 'updateProfilePic']);
+    Route::put('settings/password', [App\Http\Controllers\API\SettingsController::class, 'updatePassword']);
+    Route::delete('settings', [App\Http\Controllers\API\SettingsController::class, 'deleteAccount']);
     Route::resource('users', UsersController::class);
     Route::resource('products', ProductController::class);
     Route::resource('transactions', TransactionController::class);
     Route::resource('stores', StoreController::class);
+    Route::prefix('parking-layouts')->group(function() {
+        Route::get('/', [ParkingLayoutController::class, 'index']);
+        Route::post('/', [ParkingLayoutController::class, 'store']);
+        Route::get('/{id}', [ParkingLayoutController::class, 'show']);
+        Route::put('/{id}', [ParkingLayoutController::class, 'update']);
+        Route::delete('/{id}', [ParkingLayoutController::class, 'destroy']);
+    });
+    
+    // Parking Assignments
+    Route::prefix('parking-assignments')->group(function() {
+        Route::get('active', [ParkingAssignmentController::class, 'active']);
+        Route::post('{assignment}/switch-parking', [ParkingAssignmentController::class, 'switchParking']);
+        Route::post('{assignment}/end', [ParkingAssignmentController::class, 'endAssignment']);
+    });
+    // Place this route outside the prefix group to avoid resource route conflicts
+    Route::get('parking-assignments/by-layout/{layoutId}', [ParkingAssignmentController::class, 'byLayout']);
+    Route::resource('parking-assignments', ParkingAssignmentController::class);
+    
     // Route::resource('trees', TreeController::class);
     Route::get('/trees', [TreeController::class, 'index']);
     Route::get('/trees/{lead}', [TreeController::class, 'show']);
