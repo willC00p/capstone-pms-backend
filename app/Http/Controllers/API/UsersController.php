@@ -17,7 +17,28 @@ class UsersController extends BaseController
 {
     public function index()
     {
-        return $this->sendResponse(User::all(), "Users retrieved successfully.");
+        // Return users with their canonical details for the frontend user list
+        $users = User::leftJoin('user_details', 'users.id', '=', 'user_details.user_id')
+            ->leftJoin('roles', 'users.roles_id', '=', 'roles.id')
+            ->where(function($q) {
+                $q->whereNull('roles.name')->orWhere('roles.name', '!=', 'Admin');
+            })
+            ->select(
+                'users.id',
+                'users.name',
+                'users.email',
+                'roles.name as role',
+                'user_details.department as department',
+                'user_details.contact_number as contact_number',
+                'user_details.plate_number as plate_number',
+                'user_details.or_path as or_path',
+                'user_details.cr_path as cr_path',
+                'user_details.from_pending as from_pending'
+            )
+                ->selectRaw('(SELECT COUNT(*) FROM vehicles WHERE vehicles.user_id = users.id) as vehicle_count')
+            ->get();
+
+        return $this->sendResponse($users, "Users retrieved successfully.");
     }
 
     public function show(User $user)
@@ -106,38 +127,20 @@ class UsersController extends BaseController
     {
         $input = $request->all();
 
+        // Validate only the canonical fields we support in the admin UI
         $validator = Validator::make($input, [
             'firstname' => 'required',
-            'middlename' => 'nullable',
             'lastname' => 'required',
             'email' => 'required|email',
-            'dob' => 'nullable|date',
-            'gender' => 'nullable|in:MALE,FEMALE',
-            'civil_status' => 'nullable|string|in:SINGLE,MARRIED',
-            'nationality' => 'required|string',
-            'religion' => 'nullable|string',
-            'place_of_birth' => 'nullable|string',
-            'address' => 'required|string',
-            'municipality' => 'required|string',
-            'provice' => 'required|string',
-            'country' => 'required|string',
-            'zip_code' => 'required|string',
-            'fb_account_name' => 'nullable|string',
-            'father_firstname' => 'nullable|string',
-            'father_middleinitial' => 'nullable|string',
-            'father_lastname' => 'nullable|string',
-            'mother_firstname' => 'nullable|string',
-            'mother_middleinitial' => 'nullable|string',
-            'mother_lastname' => 'nullable|string',
-            'spouse_firstname' => 'nullable|string',
-            'spouse_middleinitial' => 'nullable|string',
-            'spouse_lastname' => 'nullable|string',
-            'no_of_children' => 'nullable|string',
-            'source_of_income' => 'nullable|string',
-            'work_description' => 'nullable|string',
-            'id_card_presented' => 'nullable|string',
-            'membership_date' => 'nullable|string',
-            'profile_photo_path' => 'nullable|string'
+            'department' => 'nullable|string',
+            'contact_number' => 'nullable|string',
+            'plate_number' => 'nullable|string',
+            'student_no' => 'nullable|string',
+            'course' => 'nullable|string',
+            'yr_section' => 'nullable|string',
+            'position' => 'nullable|string',
+            'faculty_id' => 'nullable|string',
+            'employee_id' => 'nullable|string'
         ]);
 
         if ($validator->fails()) {
@@ -154,5 +157,49 @@ class UsersController extends BaseController
         $user->save();
 
         return $this->sendResponse($user, "User successfully updated.");
+    }
+
+    /**
+     * Return users with their user details and registered vehicles.
+     * Used by frontend to preload users + vehicles for autoloading assignments.
+     */
+    public function usersWithVehicles()
+    {
+        // Exclude Admin, Guard, and Student roles from the autoload endpoint
+        $excluded = ['Admin', 'Guard', 'Student'];
+        $users = User::with(['userDetail', 'vehicles', 'role'])
+            ->get()
+            ->filter(function($u) use ($excluded) {
+                $r = $u->role ? $u->role->name : null;
+                return !in_array($r, $excluded);
+            })
+            ->map(function($u) {
+            $ud = $u->userDetail;
+            return [
+                'id' => $u->id,
+                'name' => $u->name,
+                'email' => $u->email,
+                'role' => $u->role ? $u->role->name : null,
+                'department' => $ud->department ?? null,
+                'contact_number' => $ud->contact_number ?? $u->contact ?? null,
+                'or_path' => $ud->or_path ?? null,
+                'cr_path' => $ud->cr_path ?? null,
+                // faculty_position stored in user_details.position
+                'faculty_position' => $ud->position ?? null,
+                'vehicles' => $u->vehicles->map(function($v) {
+                    return [
+                        'id' => $v->id,
+                        'user_id' => $v->user_id,
+                        'plate_number' => $v->plate_number,
+                        'vehicle_type' => $v->vehicle_type,
+                        'vehicle_color' => $v->vehicle_color,
+                        'or_path' => $v->or_path,
+                        'cr_path' => $v->cr_path
+                    ];
+                })->toArray()
+            ];
+        });
+
+        return $this->sendResponse($users, 'Users with vehicles retrieved');
     }
 }

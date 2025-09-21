@@ -63,6 +63,11 @@ class User extends Authenticatable
         return $this->hasMany(ParkingAssignment::class);
     }
 
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicle::class);
+    }
+
     public function myTeam()
     {
         return $this->hasOne(Teams::class, 'user_id', 'id');

@@ -19,6 +19,9 @@ class ResetCodeMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Your password reset code')->view('emails.reset_code')->with(['code' => $this->code]);
+        return $this->from(config('mail.from.address'), 'PMS Admin')
+                    ->subject('Your password reset code')
+                    ->view('emails.reset_code')
+                    ->with(['code' => $this->code]);
     }
 }

@@ -12,11 +12,18 @@ class Vehicle extends Model
         'vehicle_type',
         'brand',
         'model',
-        'color'
+        'vehicle_color',
+        'or_path',
+        'cr_path'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function userDetails()
+    {
+        return $this->belongsTo(UserDetails::class, 'user_details_id');
     }
 }

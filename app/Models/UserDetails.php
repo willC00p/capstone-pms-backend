@@ -11,15 +11,32 @@ class UserDetails extends Model
 
     protected $fillable = [
         'user_id',
-        'firstname', 'middlename', 'lastname', 
-        'email', 'dob', 'gender', 'civil_status', 
-        'nationality', 'religion', 'place_of_birth', 
-        'address', 'municipality', 'provice', 'country', 'zip_code', 
-        'fb_account_name', 
-        'father_firstname', 'father_middleinitial', 'father_lastname', 
-        'mother_firstname', 'mother_middleinitial', 'mother_lastname', 
-        'spouse_firstname', 'spouse_middleinitial', 'spouse_lastname', 
-        'no_of_children', 'source_of_income', 'work_description', 'id_card_presented', 'membership_date', 
-        'profile_photo_path',
+        'firstname', 'lastname',
+        'department', 'contact_number', 'plate_number',
+        'student_no', 'course', 'yr_section',
+        'faculty_id', 'employee_id',
+        'position',
+        'or_path',
+        'cr_path',
+        'from_pending',
     ];
+
+    protected $casts = [
+        'plate_numbers' => 'array',
+    ];
+
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicle::class, 'user_details_id');
+    }
+
+    public function addPlateNumber(string $plate)
+    {
+        $plates = $this->plate_numbers ?? [];
+        if (!in_array($plate, $plates)) {
+            $plates[] = $plate;
+            $this->plate_numbers = $plates;
+            $this->save();
+        }
+    }
 }

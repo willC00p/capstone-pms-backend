@@ -85,8 +85,25 @@ Route::middleware('auth:sanctum')->group( function () {
     // Place this route outside the prefix group to avoid resource route conflicts
     Route::get('parking-assignments/by-layout/{layoutId}', [ParkingAssignmentController::class, 'byLayout']);
     Route::resource('parking-assignments', ParkingAssignmentController::class);
+    // Return users along with their user_details and registered vehicles for frontend autoload
+    Route::get('users-with-vehicles', [App\Http\Controllers\API\UsersController::class, 'usersWithVehicles']);
     
     // Route::resource('trees', TreeController::class);
     Route::get('/trees', [TreeController::class, 'index']);
     Route::get('/trees/{lead}', [TreeController::class, 'show']);
+
+    // Admin account creation endpoints (require admin role)
+    Route::middleware('is_admin')->group(function() {
+        Route::post('admin/create-student', [App\Http\Controllers\API\AdminController::class, 'createStudent']);
+        Route::post('admin/create-faculty', [App\Http\Controllers\API\AdminController::class, 'createFaculty']);
+        Route::post('admin/create-employee', [App\Http\Controllers\API\AdminController::class, 'createEmployee']);
+        Route::post('admin/create-guard', [App\Http\Controllers\API\AdminController::class, 'createGuard']);
+    });
+
+    // Vehicles
+    Route::get('vehicles', [App\Http\Controllers\API\VehiclesController::class, 'index']);
+    Route::post('vehicles', [App\Http\Controllers\API\VehiclesController::class, 'store']);
+    Route::get('vehicles/{vehicle}', [App\Http\Controllers\API\VehiclesController::class, 'show']);
+    Route::put('vehicles/{vehicle}', [App\Http\Controllers\API\VehiclesController::class, 'update']);
+    Route::delete('vehicles/{vehicle}', [App\Http\Controllers\API\VehiclesController::class, 'destroy']);
 });

@@ -13,28 +13,14 @@ class RolesSeeder extends Seeder
      */
     public function run(): void
     {
+        // Remove any existing roles and seed only the canonical roles used by the application
+        DB::table('roles')->truncate();
         DB::table('roles')->insert([
-            [
-                'name' => "IT Admin"
-            ],
-            [
-                'name' => "Admin"
-            ],
-            [
-                'name' => "driver"
-            ],
-            [
-                'name' => "Member"
-            ],
-            [
-                'name' => "Finance Manager"
-            ],
-            [
-                'name' => "Marketing Manager"
-            ],
-            [
-                'name' => "Team Leader"
-            ]
+            ['name' => 'Admin'],
+            ['name' => 'Student'],
+            ['name' => 'Faculty'],
+            ['name' => 'Employee'],
+            ['name' => 'Guard'],
         ]);
     }
 }

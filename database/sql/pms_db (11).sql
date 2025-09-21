@@ -1,0 +1,591 @@
+-- phpMyAdmin SQL Dump
+-- version 5.1.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Sep 21, 2025 at 11:35 AM
+-- Server version: 10.4.22-MariaDB
+-- PHP Version: 7.4.27
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `pms_db`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin`
+--
+
+CREATE TABLE `admin` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `report_id` int(11) DEFAULT NULL,
+  `feedback_id` int(11) DEFAULT NULL,
+  `guard_id` int(11) DEFAULT NULL,
+  `role` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `feedback`
+--
+
+CREATE TABLE `feedback` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `rating` tinyint(4) NOT NULL,
+  `date_time` datetime NOT NULL,
+  `comments` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `migrations`
+--
+
+CREATE TABLE `migrations` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `migrations`
+--
+
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
+(1, '2014_10_12_000000_create_users_table', 1),
+(2, '2014_10_12_100000_create_password_resets_table', 1),
+(3, '2019_08_19_000000_create_failed_jobs_table', 1),
+(4, '2019_12_14_000001_create_personal_access_tokens_table', 1),
+(5, '2023_07_23_000000_create_parking_layouts_table', 1),
+(6, '2024_05_11_093905_create_roles_table', 1),
+(7, '2025_07_14_134849_create_driver_table', 1),
+(8, '2025_07_15_061518_create_admin_table', 1),
+(9, '2025_07_15_061907_create_user_info_table', 1),
+(10, '2025_07_15_063927_create_vehicle_table', 1),
+(11, '2025_07_15_064017_create_paking_history_table', 1),
+(12, '2025_07_15_065514_create_qr_code_table', 1),
+(13, '2025_07_15_065542_feedback_code_table', 1),
+(14, '2025_07_15_065611_create_incident_report_table', 1),
+(15, '2025_07_15_065625_create_guest_table', 1),
+(16, '2025_07_23_000001_create_parking_slots_table', 1),
+(17, '2025_07_24_052212_create_user_details_table', 1),
+(18, '2025_07_24_052248_create_teams_table', 1),
+(19, '2025_07_24_052249_create_team_users_table', 1),
+(20, '2025_07_28_122459_fix_database_structure', 1),
+(21, '2025_07_28_124021_create_parking_structure', 1),
+(22, '2025_07_30_010000_add_missing_fields', 1),
+(23, '2025_07_30_060000_add_vehicle_color_to_parking_assignments_table', 1),
+(24, '2025_07_30_070000_sync_parking_assignments_fields', 1),
+(25, '2025_07_30_120000_add_metadata_column_to_parking_slots', 1),
+(26, '2025_07_30_130000_add_metadata_to_parking_slots', 1),
+(27, '2025_08_17_193124_restructure_parking_assignments_table', 1),
+(28, '2025_08_18_add_position_to_parking_assignments', 1),
+(29, '2025_09_18_110000_ensure_users_table_exists', 1),
+(30, '2025_09_18_120000_create_admin_table', 1),
+(31, '2025_09_18_123000_add_profile_pic_to_users_table', 1),
+(32, '2025_09_20_000000_create_password_resets_table_fix', 1),
+(33, '2025_09_21_000000_add_user_details_fields', 1),
+(34, '2025_09_21_010000_ensure_users_table_exists', 1),
+(35, '2025_09_21_010500_ensure_roles_table_exists', 1),
+(36, '2025_09_21_120000_prune_user_details_columns', 1),
+(37, '2025_09_21_123000_add_faculty_employee_id_to_user_details', 1),
+(38, '2025_09_21_130000_ensure_personal_access_tokens_table', 1),
+(39, '2025_09_22_000000_add_or_and_cr_paths_to_user_details', 1),
+(40, '2025_09_22_010000_create_vehicles_table', 2),
+(41, '2025_09_22_020000_add_userdetails_and_plate_numbers', 3);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `parking_assignments`
+--
+
+CREATE TABLE `parking_assignments` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `parking_slot_id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `guest_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `guest_contact` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `faculty_position` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `purpose` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vehicle_plate` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `vehicle_color` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `vehicle_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `start_time` datetime NOT NULL,
+  `end_time` datetime DEFAULT NULL,
+  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `assignee_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `assignment_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `parking_assignments`
+--
+
+INSERT INTO `parking_assignments` (`id`, `parking_slot_id`, `user_id`, `guest_name`, `guest_contact`, `faculty_position`, `purpose`, `vehicle_plate`, `vehicle_color`, `vehicle_type`, `start_time`, `end_time`, `status`, `created_at`, `updated_at`, `assignee_type`, `assignment_type`) VALUES
+(1, 3, NULL, 'Faculty 4 Test', '0912345678', 'Faculty', '-', 'FAC-004', 'Unknown', 'car', '2025-09-21 07:40:00', NULL, 'reserved', '2025-09-20 23:42:26', '2025-09-20 23:42:26', 'faculty', 'reserve');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `parking_layouts`
+--
+
+CREATE TABLE `parking_layouts` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `background_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `layout_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`layout_data`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `parking_layouts`
+--
+
+INSERT INTO `parking_layouts` (`id`, `name`, `background_image`, `layout_data`, `created_at`, `updated_at`) VALUES
+(1, '-', 'http://localhost:8000/storage/parking-layouts/UwDq0lvVLxwhcT6lm9nXMYCazKIgWfLAj27O0ZM8.jpg', '{\"parking_slots\":[{\"id\":\"space-1\",\"space_number\":\"Space 1\",\"space_type\":\"standard\",\"space_status\":\"available\",\"position_x\":184,\"position_y\":127,\"width\":101,\"height\":230,\"rotation\":0,\"metadata\":{\"rotation\":0,\"fill\":\"rgba(0, 255, 0, 0.3)\",\"type\":\"standard\",\"name\":\"Space 1\"}},{\"id\":\"space-2\",\"space_number\":\"Space 2\",\"space_type\":\"standard\",\"space_status\":\"available\",\"position_x\":298,\"position_y\":384,\"width\":111,\"height\":250,\"rotation\":0,\"metadata\":{\"rotation\":0,\"fill\":\"rgba(0, 255, 0, 0.3)\",\"type\":\"standard\",\"name\":\"Space 2\"}},{\"id\":\"space-3\",\"space_number\":\"Space 3\",\"space_type\":\"standard\",\"space_status\":\"available\",\"position_x\":414,\"position_y\":138,\"width\":113,\"height\":215,\"rotation\":0,\"metadata\":{\"rotation\":0,\"fill\":\"rgba(0, 255, 0, 0.3)\",\"type\":\"standard\",\"name\":\"Space 3\"}}],\"lines\":[],\"texts\":[{\"id\":1758439813067,\"x\":602,\"y\":55,\"text\":\"Double click to edit\",\"fontSize\":16,\"fill\":\"#ffffff\",\"rotation\":0},{\"id\":1758439814620,\"x\":695,\"y\":680,\"text\":\"Double click to edit\",\"fontSize\":16,\"fill\":\"#ffffff\",\"rotation\":0},{\"id\":1758439816566,\"x\":685,\"y\":385,\"text\":\"Double click to edit\",\"fontSize\":16,\"fill\":\"#ffffff\",\"rotation\":0}]}', '2025-09-20 23:30:27', '2025-09-20 23:30:27');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `parking_slots`
+--
+
+CREATE TABLE `parking_slots` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `layout_id` bigint(20) UNSIGNED NOT NULL,
+  `space_number` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `space_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'standard',
+  `space_status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'available',
+  `position_x` double(8,2) NOT NULL,
+  `position_y` double(8,2) NOT NULL,
+  `width` double(8,2) NOT NULL,
+  `height` double(8,2) NOT NULL,
+  `rotation` double(8,2) NOT NULL DEFAULT 0.00,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `parking_slots`
+--
+
+INSERT INTO `parking_slots` (`id`, `layout_id`, `space_number`, `space_type`, `space_status`, `position_x`, `position_y`, `width`, `height`, `rotation`, `metadata`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Space 1', 'standard', 'available', 184.00, 127.00, 101.00, 230.00, 0.00, '{\"rotation\":0,\"fill\":\"rgba(0, 255, 0, 0.3)\",\"type\":\"standard\",\"name\":\"Space 1\"}', '2025-09-20 23:30:27', '2025-09-20 23:30:27'),
+(2, 1, 'Space 2', 'standard', 'available', 298.00, 384.00, 111.00, 250.00, 0.00, '{\"rotation\":0,\"fill\":\"rgba(0, 255, 0, 0.3)\",\"type\":\"standard\",\"name\":\"Space 2\"}', '2025-09-20 23:30:27', '2025-09-20 23:30:27'),
+(3, 1, 'Space 3', 'standard', 'reserved', 414.00, 138.00, 113.00, 215.00, 0.00, '{\"rotation\":0,\"fill\":\"rgba(0, 255, 0, 0.3)\",\"type\":\"standard\",\"name\":\"Space 3\"}', '2025-09-20 23:30:27', '2025-09-20 23:42:26');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_resets`
+--
+
+CREATE TABLE `password_resets` (
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `password_resets`
+--
+
+INSERT INTO `password_resets` (`email`, `token`, `created_at`) VALUES
+('waynelamarca720@gmail.com', '334473', '2025-09-21 00:51:51');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `personal_access_tokens`
+--
+
+CREATE TABLE `personal_access_tokens` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tokenable_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abilities` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `expires_at` date DEFAULT NULL,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `personal_access_tokens`
+--
+
+INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `expires_at`, `last_used_at`, `created_at`, `updated_at`) VALUES
+(1, 'App\\Models\\User', 18, 'MyApp', '33320b01a66c7a09fda3fe30411cb2351d7cbe60de2acb84b15c5f7e89538a15', '[\"*\"]', NULL, NULL, '2025-09-20 22:09:43', '2025-09-20 22:09:43'),
+(2, 'App\\Models\\User', 18, 'MyApp', 'f9b44315cd7c84fd46cc09baec83adbe9752899153c10124351bad96bba3b45f', '[\"*\"]', NULL, NULL, '2025-09-20 23:40:14', '2025-09-20 23:40:14'),
+(3, 'App\\Models\\User', 18, 'MyApp', '9f506e73c54b3501a673f708097b92c65d8e86ff37d751c2623829d9d11be00e', '[\"*\"]', NULL, NULL, '2025-09-21 00:34:37', '2025-09-21 00:34:37'),
+(4, 'App\\Models\\User', 18, 'MyApp', '4f8b115f565aec6f9189368638d47ef3d1abf1b07391ddebc51e94c43e6070c9', '[\"*\"]', NULL, NULL, '2025-09-21 00:49:32', '2025-09-21 00:49:32'),
+(5, 'App\\Models\\User', 18, 'MyApp', 'e406f716165a107277ad2c8f5c91925217ef1a4c8019107bf800d5966bb8e3ad', '[\"*\"]', NULL, NULL, '2025-09-21 00:50:51', '2025-09-21 00:50:51');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `roles`
+--
+
+CREATE TABLE `roles` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`id`, `name`, `description`, `created_at`, `updated_at`) VALUES
+(3, 'Student', NULL, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(4, 'Faculty', NULL, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(5, 'Employee', NULL, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(6, 'Admin', 'Administrator', '2025-09-20 21:57:48', '2025-09-20 21:57:48');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `roles_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email_verified_at` timestamp NULL DEFAULT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `profile_pic` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `roles_id`, `name`, `email`, `email_verified_at`, `password`, `profile_pic`, `remember_token`, `created_at`, `updated_at`) VALUES
+(3, 3, 'Student 1 Test', 'student1@example.com', NULL, '$2y$10$b1BMeyYQ07JpIXQ3jHRQIe8bNbp2VQtf.V/G0wk5GtirVc5B82WMO', NULL, NULL, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(4, 3, 'Student 2 Test', 'student2@example.com', NULL, '$2y$10$k6bwNYU5SfARBzYuCEPreOfiyqbNvkHl5gq0.ig4qz9bgf/WimBaO', NULL, NULL, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(5, 3, 'Student 3 Test', 'student3@example.com', NULL, '$2y$10$Epw3cMd4US4O3sovDCfLf.53wPfQQjHJ/dc3LzRZOlf7QU7YpGWXa', NULL, NULL, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(6, 3, 'Student 4 Test', 'student4@example.com', NULL, '$2y$10$ebB1nDZ4WS6Wt3TXWAHP3u68LIE9QIowWT4Ud1rcTQJLkncZpt.ym', NULL, NULL, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(7, 3, 'Student 5 Test', 'student5@example.com', NULL, '$2y$10$93AeyVWoN1Lxwfyaq59LEOmqIixdLmwJGSFKbHroQ3hKdk.z.4lfO', NULL, NULL, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(8, 4, 'Faculty 1 Test', 'faculty1@example.com', NULL, '$2y$10$lx13Bao/oTgSi1I/LUk/b.dZwNPMRRRTDDhf9bLq7iFKJpVUsmtsK', NULL, NULL, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(9, 4, 'Faculty 2 Test', 'faculty2@example.com', NULL, '$2y$10$57IBy4uNutYJHwxM3U7Gz.g1sZNFBSrDHWf2pozn.0kk/nTBIKQbW', NULL, NULL, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(10, 4, 'Faculty 3 Test', 'faculty3@example.com', NULL, '$2y$10$lNY6o56LLVcNmRv5AWL/COLkYn2p93StcZI2Q6Et46lwoAkBpLC0y', NULL, NULL, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(11, 4, 'Faculty 4 Test', 'faculty4@example.com', NULL, '$2y$10$nRrwV8V.878m2MdqE/ZCRu/EMzC0ULYrwBAhRaHmod9XasEo8GqGW', NULL, NULL, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(12, 4, 'Faculty 5 Test', 'faculty5@example.com', NULL, '$2y$10$mN2vtbzHf5d/lR902mKOdOxbSSyEYuRj.QfK7QohInonSpe36zMCi', NULL, NULL, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(13, 5, 'Employee 1 Test', 'employee1@example.com', NULL, '$2y$10$S093m9Tfjmv6vQo1IKD4b.pImP0Y7GA0Z0z21eGFOD.KYkOpXY3T.', NULL, NULL, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(14, 5, 'Employee 2 Test', 'employee2@example.com', NULL, '$2y$10$aGDJAB1kew8x2ILScINNlOrDidcBnIyITHpSjRH.ApwJKQ4927gSq', NULL, NULL, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(15, 5, 'Employee 3 Test', 'employee3@example.com', NULL, '$2y$10$GAYYRvcSWII.axk/FIPnZujasbV3WXLdhoJgDS6GhmvHuE9IjA7C2', NULL, NULL, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(16, 5, 'Employee 4 Test', 'employee4@example.com', NULL, '$2y$10$Y3IbI4al7SAkr2MeTXWqteaG8oK1UKs2bQMgjS6iKPza9EmixvhjG', NULL, NULL, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(17, 5, 'Employee 5 Test', 'employee5@example.com', NULL, '$2y$10$fgx9upykFnN2LsgyuowaLeOB0lwv6RC5.2Vc6tx8EpbkLp4peRSAG', NULL, NULL, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(18, 6, 'Jerry', 'waynelamarca720@gmail.com', NULL, '$2y$10$7QR4rlbZ4JIhIv5TovNhtOK0RlzM0zGHXljO00z9bYv9f82d1J2mG', 'http://localhost:8000/storage/profile_pics/iBVzRXVz0jaA2ZRxPZDEpgqSSovijH3raODMBDhv.jpg', NULL, '2025-09-20 21:57:48', '2025-09-21 00:51:17');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_details`
+--
+
+CREATE TABLE `user_details` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `firstname` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `lastname` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `department` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contact_number` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `plate_number` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `plate_numbers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`plate_numbers`)),
+  `student_no` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `faculty_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `employee_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `course` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `yr_section` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `position` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `or_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cr_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `or_cr_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `from_pending` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `user_details`
+--
+
+INSERT INTO `user_details` (`id`, `user_id`, `firstname`, `lastname`, `department`, `contact_number`, `plate_number`, `plate_numbers`, `student_no`, `faculty_id`, `employee_id`, `course`, `yr_section`, `position`, `or_path`, `cr_path`, `or_cr_path`, `from_pending`, `created_at`, `updated_at`) VALUES
+(2, 3, 'Student1', 'Test', 'Sample Dept', '0912345678', 'ABC-001', NULL, 'S001', NULL, NULL, 'Sample Course', '1-A', NULL, 'or_cr/or_student_1_tpPZx1.pdf', 'or_cr/cr_student_1_al9L5R.pdf', NULL, 0, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(3, 4, 'Student2', 'Test', 'Sample Dept', '0912345678', 'ABC-002', NULL, 'S002', NULL, NULL, 'Sample Course', '1-A', NULL, 'or_cr/or_student_2_LfRo20.pdf', 'or_cr/cr_student_2_33jgds.pdf', NULL, 0, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(4, 5, 'Student3', 'Test', 'Sample Dept', '0912345678', 'ABC-003', NULL, 'S003', NULL, NULL, 'Sample Course', '1-A', NULL, 'or_cr/or_student_3_G9k1pa.pdf', 'or_cr/cr_student_3_y28tLA.pdf', NULL, 0, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(5, 6, 'Student4', 'Test', 'Sample Dept', '0912345678', 'ABC-004', NULL, 'S004', NULL, NULL, 'Sample Course', '1-A', NULL, 'or_cr/or_student_4_TCtlHV.pdf', 'or_cr/cr_student_4_BWKHth.pdf', NULL, 0, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(6, 7, 'Student5', 'Test', 'Sample Dept', '0912345678', 'ABC-005', NULL, 'S005', NULL, NULL, 'Sample Course', '1-A', NULL, 'or_cr/or_student_5_Uln7kn.pdf', 'or_cr/cr_student_5_3bhhga.pdf', NULL, 0, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(7, 8, 'Faculty1', 'Test', 'Sample Dept', '0912345678', 'FAC-001', '[\"FAC-001\"]', NULL, 'F001', NULL, NULL, NULL, 'Professor', 'or_cr/or_faculty_1_z2TPgG.pdf', 'or_cr/cr_faculty_1_pM8Pyl.pdf', NULL, 0, '2025-09-20 21:42:22', '2025-09-20 22:13:02'),
+(8, 9, 'Faculty2', 'Test', 'Sample Dept', '0912345678', 'FAC-002', NULL, NULL, 'F002', NULL, NULL, NULL, 'Professor', 'or_cr/or_faculty_2_sAEZQe.pdf', 'or_cr/cr_faculty_2_2TyECr.pdf', NULL, 0, '2025-09-20 21:42:22', '2025-09-20 21:42:22'),
+(9, 10, 'Faculty3', 'Test', 'Sample Dept', '0912345678', 'FAC-003', NULL, NULL, 'F003', NULL, NULL, NULL, 'Professor', 'or_cr/or_faculty_3_xXUH9L.pdf', 'or_cr/cr_faculty_3_5a1nfZ.pdf', NULL, 0, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(10, 11, 'Faculty4', 'Test', 'Sample Dept', '0912345678', 'FAC-004', NULL, NULL, 'F004', NULL, NULL, NULL, 'Professor', 'or_cr/or_faculty_4_DDbJep.pdf', 'or_cr/cr_faculty_4_hQvMpU.pdf', NULL, 0, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(11, 12, 'Faculty5', 'Test', 'Sample Dept', '0912345678', 'FAC-005', NULL, NULL, 'F005', NULL, NULL, NULL, 'Professor', 'or_cr/or_faculty_5_FDW1a6.pdf', 'or_cr/cr_faculty_5_lnRqiA.pdf', NULL, 0, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(12, 13, 'Employee1', 'Test', 'Sample Dept', '0912345678', 'EMP-001', NULL, NULL, NULL, 'E001', NULL, NULL, 'Staff', 'or_cr/or_employee_1_NY37zz.pdf', 'or_cr/cr_employee_1_yhopEm.pdf', NULL, 0, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(13, 14, 'Employee2', 'Test', 'Sample Dept', '0912345678', 'EMP-002', NULL, NULL, NULL, 'E002', NULL, NULL, 'Staff', 'or_cr/or_employee_2_EkwPz6.pdf', 'or_cr/cr_employee_2_RZiUzU.pdf', NULL, 0, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(14, 15, 'Employee3', 'Test', 'Sample Dept', '0912345678', 'EMP-003', NULL, NULL, NULL, 'E003', NULL, NULL, 'Staff', 'or_cr/or_employee_3_cBi49o.pdf', 'or_cr/cr_employee_3_XgdB7d.pdf', NULL, 0, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(15, 16, 'Employee4', 'Test', 'Sample Dept', '0912345678', 'EMP-004', NULL, NULL, NULL, 'E004', NULL, NULL, 'Staff', 'or_cr/or_employee_4_4JLgnR.pdf', 'or_cr/cr_employee_4_ePFKym.pdf', NULL, 0, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(16, 17, 'Employee5', 'Test', 'Sample Dept', '0912345678', 'EMP-005', NULL, NULL, NULL, 'E005', NULL, NULL, 'Staff', 'or_cr/or_employee_5_Snmapg.pdf', 'or_cr/cr_employee_5_S7i4Xp.pdf', NULL, 0, '2025-09-20 21:42:23', '2025-09-20 21:42:23'),
+(17, 18, 'Admin', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2025-09-20 21:57:48', '2025-09-20 21:57:48');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `vehicles`
+--
+
+CREATE TABLE `vehicles` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `user_details_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `plate_number` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `vehicle_color` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vehicle_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `brand` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `model` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `or_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cr_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `vehicles`
+--
+
+INSERT INTO `vehicles` (`id`, `user_id`, `user_details_id`, `plate_number`, `vehicle_color`, `vehicle_type`, `brand`, `model`, `or_path`, `cr_path`, `created_at`, `updated_at`) VALUES
+(2, 3, 2, 'ABC-001', 'Yellow', 'motorcycle', 'Yamaha', 'Mio', 'or_cr/veh_or_OJINmraE.pdf', 'or_cr/veh_cr_9ZVIKydS.pdf', '2025-09-20 22:00:14', '2025-09-20 23:55:34'),
+(3, 4, 3, 'ABC-002', 'Unknown', 'Car', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(4, 5, 4, 'ABC-003', 'Unknown', 'Car', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(5, 6, 5, 'ABC-004', 'Unknown', 'Car', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(6, 7, 6, 'ABC-005', 'Green', 'Motorcycle', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(7, 8, 7, 'FAC-001', 'Green', 'Motorcycle', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(8, 9, 8, 'FAC-002', 'Green', 'Motorcycle', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(9, 10, 9, 'FAC-003', 'Green', 'Motorcycle', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(10, 11, 10, 'FAC-004', 'Green', 'Motorcycle', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(11, 12, 11, 'FAC-005', 'Green', 'Motorcycle', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(12, 13, 12, 'EMP-001', 'Green', 'Car', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(13, 14, 13, 'EMP-002', 'Green', 'Car', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(14, 15, 14, 'EMP-003', 'Green', 'Car', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(15, 16, 15, 'EMP-004', 'Green', 'Car', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(16, 17, 16, 'EMP-005', 'Green', 'Motorcycle', NULL, NULL, NULL, NULL, '2025-09-20 22:00:14', '2025-09-20 22:00:14'),
+(17, 8, NULL, 'FAC-001', 'Green', 'Car', 'Yamaha', 'Mio', 'or_cr/veh_or_CxqKVtDG.pdf', 'or_cr/veh_cr_FFTu8c4H.pdf', '2025-09-20 22:13:02', '2025-09-20 22:13:02');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `admin`
+--
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `feedback`
+--
+ALTER TABLE `feedback`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `migrations`
+--
+ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `parking_assignments`
+--
+ALTER TABLE `parking_assignments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `parking_assignments_parking_slot_id_foreign` (`parking_slot_id`),
+  ADD KEY `parking_assignments_user_id_index` (`user_id`);
+
+--
+-- Indexes for table `parking_layouts`
+--
+ALTER TABLE `parking_layouts`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `parking_slots`
+--
+ALTER TABLE `parking_slots`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `parking_slots_layout_id_foreign` (`layout_id`);
+
+--
+-- Indexes for table `password_resets`
+--
+ALTER TABLE `password_resets`
+  ADD KEY `password_resets_email_index` (`email`);
+
+--
+-- Indexes for table `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`);
+
+--
+-- Indexes for table `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `users_email_unique` (`email`);
+
+--
+-- Indexes for table `user_details`
+--
+ALTER TABLE `user_details`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `vehicles`
+--
+ALTER TABLE `vehicles`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `vehicles_user_id_foreign` (`user_id`),
+  ADD KEY `vehicles_plate_number_index` (`plate_number`),
+  ADD KEY `vehicles_user_details_id_foreign` (`user_details_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `admin`
+--
+ALTER TABLE `admin`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `feedback`
+--
+ALTER TABLE `feedback`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `migrations`
+--
+ALTER TABLE `migrations`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+
+--
+-- AUTO_INCREMENT for table `parking_assignments`
+--
+ALTER TABLE `parking_assignments`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `parking_layouts`
+--
+ALTER TABLE `parking_layouts`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `parking_slots`
+--
+ALTER TABLE `parking_slots`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- AUTO_INCREMENT for table `user_details`
+--
+ALTER TABLE `user_details`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
+-- AUTO_INCREMENT for table `vehicles`
+--
+ALTER TABLE `vehicles`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `parking_assignments`
+--
+ALTER TABLE `parking_assignments`
+  ADD CONSTRAINT `parking_assignments_parking_slot_id_foreign` FOREIGN KEY (`parking_slot_id`) REFERENCES `parking_slots` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `parking_slots`
+--
+ALTER TABLE `parking_slots`
+  ADD CONSTRAINT `parking_slots_layout_id_foreign` FOREIGN KEY (`layout_id`) REFERENCES `parking_layouts` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `vehicles`
+--
+ALTER TABLE `vehicles`
+  ADD CONSTRAINT `vehicles_user_details_id_foreign` FOREIGN KEY (`user_details_id`) REFERENCES `user_details` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `vehicles_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
