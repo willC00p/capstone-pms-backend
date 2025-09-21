@@ -13,11 +13,42 @@ return [
     |
     */
 
-    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
-        '%s%s',
-        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
-        env('APP_URL') ? ','.parse_url(env('APP_URL'), PHP_URL_HOST) : ''
-    ))),
+    /*
+    |--------------------------------------------------------------------------
+    | Stateful Domains
+    |--------------------------------------------------------------------------
+    |
+    | Allow configuring stateful domains via the SANCTUM_STATEFUL_DOMAINS env
+    | variable. If not provided, try to derive a sensible default from
+    | FRONTEND_URL (or APP_URL) and common localhost entries so local dev and
+    | simple hosting work without editing this file.
+    |
+    */
+    'stateful' => (function () {
+        $envList = env('SANCTUM_STATEFUL_DOMAINS');
+        if (!empty($envList)) {
+            return explode(',', $envList);
+        }
+
+        // Try FRONTEND_URL first, then APP_URL, then fall back to common dev hosts
+        $frontend = env('FRONTEND_URL', env('APP_URL', 'http://localhost'));
+        $host = parse_url($frontend, PHP_URL_HOST) ?: 'localhost';
+        $port = parse_url($frontend, PHP_URL_PORT);
+        $hostAndPort = $port ? $host.':'.$port : $host;
+
+        return array_values(array_unique(array_filter([
+            $host,
+            $hostAndPort,
+            'localhost',
+            'localhost:3000',
+            '127.0.0.1',
+            '127.0.0.1:8000',
+            '::1',
+            '*.test',
+        ])));
+    })(),
+
+    'prefix' => 'api',
 
     /*
     |--------------------------------------------------------------------------

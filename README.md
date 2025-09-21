@@ -62,3 +62,33 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Mail setup (Forgot Password)
+
+This project uses Laravel Mail for sending password reset codes. By default the `.env.example` contains placeholders for MailHog (local), Mailtrap (recommended for testing), and Gmail.
+
+Quick steps to configure mail locally:
+
+1. Copy `.env.example` to `.env` and set your mail settings. Example using Mailtrap:
+
+	MAIL_MAILER=smtp
+	MAIL_HOST=smtp.mailtrap.io
+	MAIL_PORT=2525
+	MAIL_USERNAME=your_mailtrap_user
+	MAIL_PASSWORD=your_mailtrap_pass
+	MAIL_ENCRYPTION=tls
+
+2. Set MAIL_FROM_ADDRESS and MAIL_FROM_NAME in `.env`.
+
+3. Clear and cache config (after changing `.env`):
+
+	php artisan config:clear
+	php artisan config:cache
+
+4. Test the forgot-password flow by calling the API endpoint:
+
+	POST /api/forgot-password  { "email": "user@example.com" }
+
+	If configured correctly, the application will send an email containing a 6-digit code (view located at `resources/views/emails/reset_code.blade.php`). Use the code to call `POST /api/reset-password` with `email`, `token`, `password`, and `password_confirmation`.
+
+If email sending fails, the API will return a detailed error message. For local development, using Mailtrap or MailHog is recommended so you can inspect messages without sending live emails.

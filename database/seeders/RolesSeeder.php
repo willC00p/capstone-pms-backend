@@ -21,6 +21,9 @@ class RolesSeeder extends Seeder
                 'name' => "Admin"
             ],
             [
+                'name' => "driver"
+            ],
+            [
                 'name' => "Member"
             ],
             [
