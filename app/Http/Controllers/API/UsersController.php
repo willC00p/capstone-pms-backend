@@ -151,9 +151,22 @@ class UsersController extends BaseController
         $user->email = $input['email'];
         $user->updated_at = Carbon::now();
 
+        // Remove email from details payload (email is stored on users table)
         unset($input['email']);
+
+        // Ensure the details are associated with this user and update the existing
+        // user_details record if present, otherwise create it. This avoids calling
+        // updateOrCreate in a manner that can produce duplicate rows.
         $input['user_id'] = $user->id;
-        $user->userDetail()->save(UserDetails::updateOrCreate($input));
+
+        if ($user->userDetail) {
+            // update existing detail row
+            $user->userDetail()->update($input);
+        } else {
+            // create a new detail row
+            $user->userDetail()->create($input);
+        }
+
         $user->save();
 
         return $this->sendResponse($user, "User successfully updated.");
