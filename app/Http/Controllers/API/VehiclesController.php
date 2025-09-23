@@ -23,7 +23,7 @@ class VehiclesController extends BaseController
     {
         $v = Validator::make($request->all(), [
             'user_id' => 'nullable|exists:users,id',
-            'plate_number' => 'required|string',
+            'plate_number' => 'required|string|unique:vehicles,plate_number',
             'vehicle_color' => 'nullable|string',
             'vehicle_type' => 'nullable|string',
             'brand' => 'nullable|string',
@@ -34,7 +34,7 @@ class VehiclesController extends BaseController
             'cr_number' => 'nullable|string|unique:vehicles,cr_number',
         ]);
 
-        if ($v->fails()) return $this->sendError('Validation error', $v->errors());
+    if ($v->fails()) return $this->sendError('Validation error', $v->errors(), 422);
 
         // If attaching to a user, ensure they don't have more than 3 vehicles
         $userDetailsId = null;
@@ -98,7 +98,7 @@ class VehiclesController extends BaseController
     public function update(Request $request, Vehicle $vehicle)
     {
         $v = Validator::make($request->all(), [
-            'plate_number' => 'required|string',
+            'plate_number' => ['required','string', Rule::unique('vehicles','plate_number')->ignore($vehicle->id)],
             'vehicle_color' => 'nullable|string',
             'vehicle_type' => 'nullable|string',
             'brand' => 'nullable|string',
@@ -109,7 +109,7 @@ class VehiclesController extends BaseController
             'cr_number' => ['nullable','string', Rule::unique('vehicles','cr_number')->ignore($vehicle->id)],
         ]);
 
-        if ($v->fails()) return $this->sendError('Validation error', $v->errors());
+    if ($v->fails()) return $this->sendError('Validation error', $v->errors(), 422);
 
         // handle files
         if ($request->hasFile('or_file')) {
@@ -178,7 +178,7 @@ class VehiclesController extends BaseController
             'email' => 'nullable|email',
             'contact_number' => 'nullable|string',
         ]);
-        if ($v->fails()) return $this->sendError('Validation error', $v->errors());
+    if ($v->fails()) return $this->sendError('Validation error', $v->errors(), 422);
 
         $exists = [];
         // allow the caller to exclude the current user or vehicle being edited

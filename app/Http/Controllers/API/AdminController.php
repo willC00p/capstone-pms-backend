@@ -44,7 +44,7 @@ class AdminController extends BaseController
             'model' => 'required|string',
         ]);
 
-        if ($v->fails()) return $this->sendError('Validation error', $v->errors());
+    if ($v->fails()) return $this->sendError('Validation error', $v->errors(), 422);
 
 
         // ensure role exists and assign
@@ -145,7 +145,7 @@ class AdminController extends BaseController
             'model' => 'required|string',
         ]);
 
-        if ($v->fails()) return $this->sendError('Validation error', $v->errors());
+    if ($v->fails()) return $this->sendError('Validation error', $v->errors(), 422);
 
         $role = Role::firstOrCreate(['name' => 'Faculty']);
         $user = User::create([
@@ -235,7 +235,7 @@ class AdminController extends BaseController
             'model' => 'required|string',
         ]);
 
-        if ($v->fails()) return $this->sendError('Validation error', $v->errors());
+    if ($v->fails()) return $this->sendError('Validation error', $v->errors(), 422);
 
         $role = Role::firstOrCreate(['name' => 'Employee']);
         $user = User::create([
@@ -309,7 +309,7 @@ class AdminController extends BaseController
             'password' => 'required|min:6',
         ]);
 
-        if ($v->fails()) return $this->sendError('Validation error', $v->errors());
+    if ($v->fails()) return $this->sendError('Validation error', $v->errors(), 422);
 
         $role = Role::firstOrCreate(['name' => 'Guard']);
         $user = User::create([
