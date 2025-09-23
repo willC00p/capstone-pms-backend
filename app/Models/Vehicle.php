@@ -14,7 +14,9 @@ class Vehicle extends Model
         'model',
         'vehicle_color',
         'or_path',
-        'cr_path'
+        'cr_path',
+        'or_number',
+        'cr_number'
     ];
 
     public function user()

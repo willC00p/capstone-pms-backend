@@ -18,6 +18,8 @@ class UserDetails extends Model
         'position',
         'or_path',
         'cr_path',
+        'or_number',
+        'cr_number',
         'from_pending',
     ];
 

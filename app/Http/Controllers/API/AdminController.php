@@ -6,10 +6,12 @@ use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\User;
 use App\Models\UserDetails;
 use App\Models\Role;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class AdminController extends BaseController
 {
@@ -22,17 +24,24 @@ class AdminController extends BaseController
             'lastname' => 'required|string',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'department' => 'nullable|string',
-            'student_no' => 'nullable|string',
-            'course' => 'nullable|string',
-            'yr_section' => 'nullable|string',
-            'contact_number' => 'nullable|string',
-            'plate_number' => 'nullable|string',
+            'department' => 'required|string',
+            'student_no' => 'required|string',
+            'course' => 'required|string',
+            'yr_section' => 'required|string',
+            'contact_number' => ['required','string', Rule::unique('user_details','contact_number')],
+            'plate_number' => 'required|string',
+            'plate_number' => ['required','string', Rule::unique('vehicles','plate_number')],
             'faculty_id' => 'nullable|string',
             'employee_id' => 'nullable|string',
-            'or_file' => 'sometimes|file|mimes:pdf|max:5120',
-            'cr_file' => 'sometimes|file|mimes:pdf|max:5120',
+            'or_file' => 'required|file|mimes:pdf|max:5120',
+            'cr_file' => 'required|file|mimes:pdf|max:5120',
             'or_cr_pdf' => 'sometimes|file|mimes:pdf|max:5120',
+            'or_number' => ['required','string', Rule::unique('vehicles','or_number')],
+            'cr_number' => ['required','string', Rule::unique('vehicles','cr_number')],
+            'vehicle_color' => 'required|string',
+            'vehicle_type' => 'required|string',
+            'brand' => 'required|string',
+            'model' => 'required|string',
         ]);
 
         if ($v->fails()) return $this->sendError('Validation error', $v->errors());
@@ -83,9 +92,30 @@ class AdminController extends BaseController
             'plate_number' => $request->plate_number,
             'or_path' => $orPath,
             'cr_path' => $crPath,
+            'or_number' => $request->or_number ?? null,
+            'cr_number' => $request->cr_number ?? null,
             'from_pending' => false,
             'membership_date' => $user->created_at,
         ]);
+
+        // If a plate number was provided, create a Vehicle record and link it
+        $ud = $user->userDetail()->first();
+        if (!empty($request->plate_number)) {
+            $vehicle = Vehicle::create([
+                'user_id' => $user->id,
+                'user_details_id' => $ud->id ?? null,
+                'plate_number' => $request->plate_number,
+                'vehicle_color' => $request->vehicle_color ?? null,
+                'vehicle_type' => $request->vehicle_type ?? null,
+                'brand' => $request->brand ?? null,
+                'model' => $request->model ?? null,
+                'or_path' => $orPath ?? null,
+                'cr_path' => $crPath ?? null,
+                'or_number' => $request->or_number ?? null,
+                'cr_number' => $request->cr_number ?? null,
+            ]);
+            if ($ud) $ud->addPlateNumber($vehicle->plate_number);
+        }
 
         return $this->sendResponse(['id' => $user->id], 'Student account created.');
     }
@@ -98,14 +128,21 @@ class AdminController extends BaseController
             'lastname' => 'required|string',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'department' => 'nullable|string',
-            'position' => 'nullable|string',
+            'department' => 'required|string',
+            'position' => 'required|string',
             'faculty_id' => 'nullable|string',
-            'contact_number' => 'nullable|string',
-            'plate_number' => 'nullable|string',
-            'or_file' => 'sometimes|file|mimes:pdf|max:5120',
-            'cr_file' => 'sometimes|file|mimes:pdf|max:5120',
+            'contact_number' => ['required','string', Rule::unique('user_details','contact_number')],
+            'plate_number' => 'required|string',
+            'plate_number' => ['required','string', Rule::unique('vehicles','plate_number')],
+            'or_file' => 'required|file|mimes:pdf|max:5120',
+            'cr_file' => 'required|file|mimes:pdf|max:5120',
             'or_cr_pdf' => 'sometimes|file|mimes:pdf|max:5120',
+            'or_number' => ['required','string', Rule::unique('vehicles','or_number')],
+            'cr_number' => ['required','string', Rule::unique('vehicles','cr_number')],
+            'vehicle_color' => 'required|string',
+            'vehicle_type' => 'required|string',
+            'brand' => 'required|string',
+            'model' => 'required|string',
         ]);
 
         if ($v->fails()) return $this->sendError('Validation error', $v->errors());
@@ -151,6 +188,25 @@ class AdminController extends BaseController
             'membership_date' => $user->created_at,
         ]);
 
+        // create vehicle if plate provided
+        $ud = $user->userDetail()->first();
+        if (!empty($request->plate_number)) {
+            $vehicle = Vehicle::create([
+                'user_id' => $user->id,
+                'user_details_id' => $ud->id ?? null,
+                'plate_number' => $request->plate_number,
+                'vehicle_color' => $request->vehicle_color ?? null,
+                'vehicle_type' => $request->vehicle_type ?? null,
+                'brand' => $request->brand ?? null,
+                'model' => $request->model ?? null,
+                'or_path' => $orPath ?? null,
+                'cr_path' => $crPath ?? null,
+                'or_number' => $request->or_number ?? null,
+                'cr_number' => $request->cr_number ?? null,
+            ]);
+            if ($ud) $ud->addPlateNumber($vehicle->plate_number);
+        }
+
         return $this->sendResponse(['id' => $user->id], 'Faculty account created.');
     }
 
@@ -162,14 +218,21 @@ class AdminController extends BaseController
             'lastname' => 'required|string',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'department' => 'nullable|string',
-            'position' => 'nullable|string',
+            'department' => 'required|string',
+            'position' => 'required|string',
             'employee_id' => 'nullable|string',
-            'contact_number' => 'nullable|string',
-            'plate_number' => 'nullable|string',
-            'or_file' => 'sometimes|file|mimes:pdf|max:5120',
-            'cr_file' => 'sometimes|file|mimes:pdf|max:5120',
+            'contact_number' => ['required','string', Rule::unique('user_details','contact_number')],
+            'plate_number' => 'required|string',
+            'plate_number' => ['required','string', Rule::unique('vehicles','plate_number')],
+            'or_file' => 'required|file|mimes:pdf|max:5120',
+            'cr_file' => 'required|file|mimes:pdf|max:5120',
             'or_cr_pdf' => 'sometimes|file|mimes:pdf|max:5120',
+            'or_number' => ['required','string', Rule::unique('vehicles','or_number')],
+            'cr_number' => ['required','string', Rule::unique('vehicles','cr_number')],
+            'vehicle_color' => 'required|string',
+            'vehicle_type' => 'required|string',
+            'brand' => 'required|string',
+            'model' => 'required|string',
         ]);
 
         if ($v->fails()) return $this->sendError('Validation error', $v->errors());
@@ -214,6 +277,25 @@ class AdminController extends BaseController
             'from_pending' => false,
             'membership_date' => $user->created_at,
         ]);
+
+        // create vehicle if plate provided
+        $ud = $user->userDetail()->first();
+        if (!empty($request->plate_number)) {
+            $vehicle = Vehicle::create([
+                'user_id' => $user->id,
+                'user_details_id' => $ud->id ?? null,
+                'plate_number' => $request->plate_number,
+                'vehicle_color' => $request->vehicle_color ?? null,
+                'vehicle_type' => $request->vehicle_type ?? null,
+                'brand' => $request->brand ?? null,
+                'model' => $request->model ?? null,
+                'or_path' => $orPath ?? null,
+                'cr_path' => $crPath ?? null,
+                'or_number' => $request->or_number ?? null,
+                'cr_number' => $request->cr_number ?? null,
+            ]);
+            if ($ud) $ud->addPlateNumber($vehicle->plate_number);
+        }
 
         return $this->sendResponse(['id' => $user->id], 'Employee account created.');
     }

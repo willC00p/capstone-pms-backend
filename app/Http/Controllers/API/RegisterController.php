@@ -11,6 +11,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Validator;
+use Illuminate\Support\Str;
+use App\Models\Vehicle;
    
 class RegisterController extends BaseController
 {
@@ -27,6 +29,17 @@ class RegisterController extends BaseController
             'email' => 'required|email|unique:users,email',
             'password' => 'required',
             'c_password' => 'required|same:password',
+            // vehicle / OR-CR uploads
+            'plate_number' => 'nullable|string',
+            'vehicle_color' => 'nullable|string',
+            'vehicle_type' => 'nullable|string',
+            'brand' => 'nullable|string',
+            'model' => 'nullable|string',
+            'or_file' => 'sometimes|file|mimes:pdf|max:5120',
+            'cr_file' => 'sometimes|file|mimes:pdf|max:5120',
+            'or_cr_pdf' => 'sometimes|file|mimes:pdf|max:5120',
+            'or_number' => 'nullable|string|unique:vehicles,or_number',
+            'cr_number' => 'nullable|string|unique:vehicles,cr_number',
             'referred_by' => [
                 'nullable', 
                 'email', 
@@ -57,8 +70,63 @@ class RegisterController extends BaseController
             'firstname' => $input['firstname'],
             'lastname' => $input['lastname'],
             'nationality' => 'Filipino',
-            'membership_date' => $user->created_at
+            'membership_date' => $user->created_at,
+            // placeholders for OR/CR paths (may be set below)
+            'or_path' => null,
+            'cr_path' => null,
+            'or_number' => $input['or_number'] ?? null,
+            'cr_number' => $input['cr_number'] ?? null,
+            'plate_number' => $input['plate_number'] ?? null,
         ]));
+
+        // Handle vehicle OR/CR upload and vehicle creation if plate_number supplied
+        $orPath = null; $crPath = null;
+        if (isset($input['or_file']) || isset($input['cr_file']) || isset($input['or_cr_pdf'])) {
+            // Note: incoming files are in the request, so access via $request
+            if ($request->hasFile('or_cr_pdf')) {
+                $file = $request->file('or_cr_pdf');
+                $filename = 'orcr_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+                $orPath = $file->storeAs('or_cr', $filename, 'public');
+            }
+            if ($request->hasFile('or_file')) {
+                $file = $request->file('or_file');
+                $filename = 'or_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+                $orPath = $file->storeAs('or_cr', $filename, 'public');
+            }
+            if ($request->hasFile('cr_file')) {
+                $file = $request->file('cr_file');
+                $filename = 'cr_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+                $crPath = $file->storeAs('or_cr', $filename, 'public');
+            }
+
+            // update the userDetails with or/cr paths
+            $ud = $user->userDetail()->first();
+            if ($ud) {
+                $ud->or_path = $orPath ?? $ud->or_path;
+                $ud->cr_path = $crPath ?? $ud->cr_path;
+                $ud->or_number = $input['or_number'] ?? $ud->or_number;
+                $ud->cr_number = $input['cr_number'] ?? $ud->cr_number;
+                $ud->save();
+            }
+        }
+
+        // Create a Vehicle record if a plate number was provided
+        if (!empty($input['plate_number'])) {
+            $vehicleData = [
+                'user_id' => $user->id,
+                'user_details_id' => $user->userDetail()->first()->id ?? null,
+                'plate_number' => $input['plate_number'],
+                'vehicle_color' => $input['vehicle_color'] ?? null,
+                'vehicle_type' => $input['vehicle_type'] ?? null,
+                'brand' => $input['brand'] ?? null,
+                'model' => $input['model'] ?? null,
+                'or_path' => $orPath,
+                'cr_path' => $crPath,
+                'or_number' => $input['or_number'] ?? null,
+                'cr_number' => $input['cr_number'] ?? null,
+            ];
+            Vehicle::create($vehicleData);
+        }
 
         $team = $user->myTeam()->create([
             'user_id' => $user->id,
@@ -90,20 +158,27 @@ class RegisterController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function login(Request $request)
-    {
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){ 
-            $user = Auth::user(); 
-            $success['token'] =  $user->createToken('MyApp')->plainTextToken; 
-            $success['name'] =  $user->name;
-            $success['email'] = $user->email;
-   
-            return $this->sendResponse($success, 'User login successfully.');
-        } 
-        else{ 
-            return $this->sendError('Unauthorised.', ['error'=>'Unauthorised']);
-        } 
+public function login(Request $request)
+{
+    $request->validate([
+        'email' => 'required|string|email',
+        'password' => 'required|string',
+        'remember' => 'boolean'
+    ]);
+
+    $credentials = $request->only('email', 'password');
+    $remember = $request->remember ?? false;
+
+    if (!Auth::attempt($credentials, $remember)) {
+        return response()->json(['message' => 'Email or Password is incorrect.'], 401);
     }
+
+    $user = Auth::user();
+    $success['token'] = $user->createToken('MyApp')->plainTextToken;
+    $success['name'] = $user->name;
+
+    return response()->json(['data' => $success, 'message' => 'Login Successfully'], 200);
+}
 
     public function logout(Request $request)
     {

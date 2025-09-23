@@ -102,6 +102,9 @@ Route::middleware('auth:sanctum')->group( function () {
 
     // Vehicles
     Route::get('vehicles', [App\Http\Controllers\API\VehiclesController::class, 'index']);
+    Route::post('vehicles/check-unique', [App\Http\Controllers\API\VehiclesController::class, 'checkUnique']);
+        Route::get('vehicles/lookup-by-plate/{plate}', [App\Http\Controllers\API\VehiclesController::class, 'lookupByPlate']);
+        Route::get('vehicles/search', [App\Http\Controllers\API\VehiclesController::class, 'searchPlates']);
     Route::post('vehicles', [App\Http\Controllers\API\VehiclesController::class, 'store']);
     Route::get('vehicles/{vehicle}', [App\Http\Controllers\API\VehiclesController::class, 'show']);
     Route::put('vehicles/{vehicle}', [App\Http\Controllers\API\VehiclesController::class, 'update']);

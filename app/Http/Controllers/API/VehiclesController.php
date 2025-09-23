@@ -9,6 +9,7 @@ use App\Models\UserDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class VehiclesController extends BaseController
 {
@@ -29,6 +30,8 @@ class VehiclesController extends BaseController
             'model' => 'nullable|string',
             'or_file' => 'sometimes|file|mimes:pdf|max:5120',
             'cr_file' => 'sometimes|file|mimes:pdf|max:5120',
+            'or_number' => 'nullable|string|unique:vehicles,or_number',
+            'cr_number' => 'nullable|string|unique:vehicles,cr_number',
         ]);
 
         if ($v->fails()) return $this->sendError('Validation error', $v->errors());
@@ -72,6 +75,8 @@ class VehiclesController extends BaseController
             'model' => $request->model,
             'or_path' => $orPath,
             'cr_path' => $crPath,
+            'or_number' => $request->or_number ?? null,
+            'cr_number' => $request->cr_number ?? null,
         ]);
 
         // Link vehicle to user_details plate_numbers array if we have user details
@@ -100,6 +105,8 @@ class VehiclesController extends BaseController
             'model' => 'nullable|string',
             'or_file' => 'sometimes|file|mimes:pdf|max:5120',
             'cr_file' => 'sometimes|file|mimes:pdf|max:5120',
+            'or_number' => ['nullable','string', Rule::unique('vehicles','or_number')->ignore($vehicle->id)],
+            'cr_number' => ['nullable','string', Rule::unique('vehicles','cr_number')->ignore($vehicle->id)],
         ]);
 
         if ($v->fails()) return $this->sendError('Validation error', $v->errors());
@@ -115,6 +122,10 @@ class VehiclesController extends BaseController
             $filename = 'veh_cr_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
             $vehicle->cr_path = $file->storeAs('or_cr', $filename, 'public');
         }
+
+        // optional OR/CR numbers
+        $vehicle->or_number = $request->or_number ?? $vehicle->or_number;
+        $vehicle->cr_number = $request->cr_number ?? $vehicle->cr_number;
 
         $oldPlate = $vehicle->plate_number;
         $vehicle->plate_number = $request->plate_number;
@@ -155,5 +166,76 @@ class VehiclesController extends BaseController
 
         $vehicle->delete();
         return $this->sendResponse([], 'Vehicle deleted');
+    }
+
+    // Public check for OR/CR uniqueness (used by frontend before submit)
+    public function checkUnique(Request $request)
+    {
+        $v = Validator::make($request->all(), [
+            'or_number' => 'nullable|string',
+            'cr_number' => 'nullable|string',
+            'plate_number' => 'nullable|string',
+            'email' => 'nullable|email',
+            'contact_number' => 'nullable|string',
+        ]);
+        if ($v->fails()) return $this->sendError('Validation error', $v->errors());
+
+        $exists = [];
+        if ($request->filled('or_number')) {
+            $exists['or_number'] = Vehicle::where('or_number', $request->or_number)->exists();
+        }
+        if ($request->filled('cr_number')) {
+            $exists['cr_number'] = Vehicle::where('cr_number', $request->cr_number)->exists();
+        }
+        if ($request->filled('plate_number')) {
+            $exists['plate_number'] = Vehicle::where('plate_number', $request->plate_number)->exists();
+        }
+        if ($request->filled('email')) {
+            // email uniqueness should consider users table
+            $exists['email'] = User::where('email', $request->email)->exists();
+        }
+        if ($request->filled('contact_number')) {
+            // contact stored in user_details
+            $exists['contact_number'] = UserDetails::where('contact_number', $request->contact_number)->exists();
+        }
+
+        return $this->sendResponse(['exists' => $exists], 'Uniqueness check');
+    }
+
+    /**
+     * Lookup a vehicle by plate (case-insensitive) and return vehicle with user and userDetails.
+     * Used by frontend to auto-fill assignment form when typing a plate number.
+     */
+    public function lookupByPlate($plate)
+    {
+        if (!$plate) {
+            return $this->sendResponse(null, 'No plate provided');
+        }
+
+        $normalized = mb_strtolower(trim($plate));
+        $vehicle = Vehicle::with(['user', 'userDetails'])
+            ->whereRaw('LOWER(plate_number) = ?', [$normalized])
+            ->first();
+
+        return $this->sendResponse($vehicle, $vehicle ? 'Vehicle found' : 'Vehicle not found');
+    }
+
+    /**
+     * Partial search for plates. Accepts query param 'q' and returns up to 12 matches.
+     */
+    public function searchPlates(Request $request)
+    {
+        $q = $request->query('q', '');
+        if (!is_string($q) || trim($q) === '') {
+            return $this->sendResponse([], 'No query provided');
+        }
+        $term = '%' . strtolower(trim($q)) . '%';
+        $matches = Vehicle::with(['user','userDetails'])
+            ->whereRaw('LOWER(plate_number) LIKE ?', [$term])
+            ->orderBy('plate_number')
+            ->limit(12)
+            ->get();
+
+        return $this->sendResponse($matches, 'Search results');
     }
 }
