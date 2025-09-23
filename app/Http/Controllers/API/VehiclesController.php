@@ -230,7 +230,7 @@ class VehiclesController extends BaseController
         }
 
         $normalized = mb_strtolower(trim($plate));
-        $vehicle = Vehicle::with(['user', 'userDetails'])
+        $vehicle = Vehicle::with(['user.userDetails', 'userDetails'])
             ->whereRaw('LOWER(plate_number) = ?', [$normalized])
             ->first();
 
@@ -247,7 +247,7 @@ class VehiclesController extends BaseController
             return $this->sendResponse([], 'No query provided');
         }
         $term = '%' . strtolower(trim($q)) . '%';
-        $matches = Vehicle::with(['user','userDetails'])
+        $matches = Vehicle::with(['user.userDetails','userDetails'])
             ->whereRaw('LOWER(plate_number) LIKE ?', [$term])
             ->orderBy('plate_number')
             ->limit(12)
