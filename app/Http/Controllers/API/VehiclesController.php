@@ -181,22 +181,39 @@ class VehiclesController extends BaseController
         if ($v->fails()) return $this->sendError('Validation error', $v->errors());
 
         $exists = [];
+        // allow the caller to exclude the current user or vehicle being edited
+        $excludeUserId = $request->input('exclude_user_id');
+        $excludeVehicleId = $request->input('exclude_vehicle_id');
+
         if ($request->filled('or_number')) {
-            $exists['or_number'] = Vehicle::where('or_number', $request->or_number)->exists();
+            $q = Vehicle::where('or_number', $request->or_number);
+            if ($excludeVehicleId) $q->where('id', '!=', $excludeVehicleId);
+            $exists['or_number'] = $q->exists();
         }
         if ($request->filled('cr_number')) {
-            $exists['cr_number'] = Vehicle::where('cr_number', $request->cr_number)->exists();
+            $q = Vehicle::where('cr_number', $request->cr_number);
+            if ($excludeVehicleId) $q->where('id', '!=', $excludeVehicleId);
+            $exists['cr_number'] = $q->exists();
         }
         if ($request->filled('plate_number')) {
-            $exists['plate_number'] = Vehicle::where('plate_number', $request->plate_number)->exists();
+            $q = Vehicle::where('plate_number', $request->plate_number);
+            if ($excludeVehicleId) $q->where('id', '!=', $excludeVehicleId);
+            $exists['plate_number'] = $q->exists();
         }
         if ($request->filled('email')) {
             // email uniqueness should consider users table
-            $exists['email'] = User::where('email', $request->email)->exists();
+            $q = User::where('email', $request->email);
+            if ($excludeUserId) $q->where('id', '!=', $excludeUserId);
+            $exists['email'] = $q->exists();
         }
         if ($request->filled('contact_number')) {
             // contact stored in user_details
-            $exists['contact_number'] = UserDetails::where('contact_number', $request->contact_number)->exists();
+            $q = UserDetails::where('contact_number', $request->contact_number);
+            if ($excludeUserId) {
+                $ud = UserDetails::where('user_id', $excludeUserId)->first();
+                if ($ud) $q->where('id', '!=', $ud->id);
+            }
+            $exists['contact_number'] = $q->exists();
         }
 
         return $this->sendResponse(['exists' => $exists], 'Uniqueness check');
