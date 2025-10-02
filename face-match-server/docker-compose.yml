@@ -1,0 +1,3 @@
+## docker-compose intentionally disabled in repo. Use your own compose if needed.
+version: '3.8'
+services: {}

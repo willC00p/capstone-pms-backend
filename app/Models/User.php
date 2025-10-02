@@ -70,7 +70,7 @@ class User extends Authenticatable
 
     public function myTeam()
     {
-        return $this->hasOne(Teams::class, 'user_id', 'id');
+        return $this->hasOne(Team::class, 'user_id', 'id');
     }
 
     public function precedingTeamLead()
@@ -90,13 +90,13 @@ class User extends Authenticatable
 
     public function team()
     {
-        return $this->belongsToMany(Teams::class, 'team_user', 'team_id')
+        return $this->belongsToMany(Team::class, 'team_users', 'team_id')
                 ->withPivot('lead_id');
     }
 
     public function ledTeams()
     {
-        return $this->hasMany(Teams::class);
+        return $this->hasMany(Team::class);
     }
 
 }

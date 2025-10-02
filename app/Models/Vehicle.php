@@ -8,6 +8,7 @@ class Vehicle extends Model
 {
     protected $fillable = [
         'user_id',
+        'user_details_id',
         'plate_number',
         'vehicle_type',
         'brand',

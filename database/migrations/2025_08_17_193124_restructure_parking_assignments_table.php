@@ -15,7 +15,12 @@ return new class extends Migration
 
         Schema::create('parking_assignments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('parking_slot_id')->constrained('parking_slots')->onDelete('cascade');
+            // avoid creating a DB-level foreign key here because the `parking_slots` creation
+            // lives in a backup migration file (not executed before this one). Some DB
+            // environments produce errno 150 when the referenced table/column isn't present
+            // or has mismatched definitions. Use an indexed unsignedBigInteger instead and
+            // add a FK later (or restore the parking_slots migration to the main folder).
+            $table->unsignedBigInteger('parking_slot_id')->nullable()->index();
             // define user_id as unsignedBigInteger nullable and index it instead of forcing a FK constraint
             // Some environments may fail to create this FK during migrations; keep it nullable and indexed.
             $table->unsignedBigInteger('user_id')->nullable()->index();

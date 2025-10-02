@@ -92,3 +92,8 @@ Quick steps to configure mail locally:
 	If configured correctly, the application will send an email containing a 6-digit code (view located at `resources/views/emails/reset_code.blade.php`). Use the code to call `POST /api/reset-password` with `email`, `token`, `password`, and `password_confirmation`.
 
 If email sending fails, the API will return a detailed error message. For local development, using Mailtrap or MailHog is recommended so you can inspect messages without sending live emails.
+
+## Document parsing
+
+This repository includes server-side heuristics used by the API endpoint `POST /api/parse-document` to extract probable text, OR number, CR number, and a candidate name from uploaded PDFs. The implementation uses Smalot\PdfParser when available and falls back to an Imagick + Tesseract OCR pipeline when necessary. The heuristics aim to be conservative and avoid external dependencies.
+

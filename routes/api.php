@@ -30,12 +30,20 @@ use App\Http\Controllers\FileController;
 // Public routes for serving images
 Route::get('image/{path}', [FileController::class, 'serveImage'])->where('path', '.*');
 
+// LLM extraction endpoint removed. Extraction is handled by server-side heuristics in parse-document.
+
+// Face verification removed — previously handled by external service. Routes cleared.
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// face match proxy removed
+
 Route::controller(RegisterController::class)->group(function(){
     Route::post('register', 'register');
+    // parse single document (PDF) and return extracted text/fields for client-side validation
+    Route::post('parse-document', 'parseDocument');
     Route::post('login', 'login');
     Route::post('logout', 'logout');
 });
